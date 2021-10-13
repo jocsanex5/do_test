@@ -59,7 +59,7 @@ session_start();
 
 			if($consulFoto){
 
-				move_uploaded_file($temp, 'recursos/evidencias/' . $imagen);
+				move_uploaded_file($temp, 'recursos/evidencias' . $imagen);
 				$id_sub_im = null;
 			
 			} else{
@@ -72,13 +72,28 @@ session_start();
 	function subirEvidens($conn)
 	{ 
 		if (isset($_POST['enviarEvi'])) { 
-			
-			db_img('evi1', $conn);
-			db_img('evi2', $conn);
-			db_img('evi3', $conn);
+
+			$id = $_SESSION['id_sub_im'];
+
+			$countfiles = count($_FILES['file']['name']);
+
+			for ($i=0; $i < $countfiles; $i++) { 
+				
+				$nombre = $_FILES['file']['name'][$i];
+				$tmp = $_FILES['file']['tmp_name'][$i];
+
+				$subirFoto = "INSERT INTO `$id`(imagen) VALUES ('$nombre')";
+				$consulFoto = mysqli_query($conn, $subirFoto);
+
+				move_uploaded_file($tmp, 'recursos/evidencias/' . $nombre);
+			}
+
+			$_SESSION['id_sub_im'] = '';
 
 			?>
-				<script>cargar();</script>;
+				<script>
+					window.location = "index.php";
+				</script>
 			<?php
 		}
 	}
@@ -158,6 +173,18 @@ session_start();
 		}
 	}
 
+	/* esta funcion genera el formualrio de ingreso de usuario */
+
+	function mostrarFormIngreso()
+	{
+		?><script>usuario();</script>;<?php
+	}
+
+	function recargarPagina()
+	{
+		?><script>cargar();</script>;<?php
+	}
+
 	function modificarClass($conn)
 	{
 		
@@ -175,9 +202,65 @@ session_start();
 
 			if($consultaModifClase){
 
-				?>
-					<script>cargar();</script>;
-				<?php
+				recargarPagina();
 			}
 		}
 	}
+
+	function entrarAlSistema()
+	{
+		if(isset($_POST['entrar-admin'])){
+
+			if(preg_match("/^j0cSanAdmin0521s2$/", $_POST['cod-entrar'])){
+
+				$_SESSION['acceso'] = 'admin';
+				unset($_SESSION['err']);
+				header('location: index.php');
+			
+			} else{
+
+				$_SESSION['err'] = array('TypeErr1' => 'DatInvalidSESS03');
+				header('location: index.php');
+			}
+		
+		} elseif(isset($_POST['entrar-visit'])){
+
+			$_SESSION['acceso'] = 'visitante'; 
+			unset($_SESSION['err']);
+			header('location: index.php');
+		} 
+	}
+
+	function eventosClases()
+	{
+		if (isset($_SESSION['acceso'])) {
+			
+			if($_SESSION['acceso'] == 'admin'){
+
+				?><script>opcdeclases();</script>;<?php
+			} 
+		
+		} else mostrarFormIngreso();
+
+		//errores de de ingreso
+
+		if(isset($_SESSION['err'])){
+
+			?><script>accesoDenegado();</script>;<?php
+		}
+	}
+
+	function salir()
+	{
+		if(isset($_POST['salir'])){
+
+			session_unset();
+			session_destroy();
+
+			recargarPagina();
+		}
+	}
+
+	entrarAlSistema();
+
+?>

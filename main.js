@@ -160,6 +160,74 @@ const opcdeclases = () =>{
 	})
 }
 
+const usuario = () =>{
+
+	Swal.fire({
+
+		allowOutsideClick : false,
+		allowEscapekey : false,
+		allowEnterKey : false,
+		showCloseButton : false,
+		showConfirmButton : false,
+		title : 'Bienvenido!!!',
+		html : `
+			<form action="funs_php.php" method="post">
+				<img src="recursos/usuario.png" width="200px" alt="">
+
+				<div class="mb-3">
+					<label for="exampleInputPassword1" class="form-label">Cod de entrada</label>
+					<input type="password" class="form-control text-center" id="exampleInputPassword1" name="cod-entrar">
+				</div>
+
+				<button type="submit" name="entrar-admin" id="btnSubir" class="btn btn-primary p-3 w-50">Entrar</button>
+				<button type="submit" name="entrar-visit" id="entrar-visit" class="bg-transparent border-0 m-4 w-50 text-secondary">Soy vistante</button>
+			</form>
+		`
+	})
+}
+
+const accesoDenegado = () =>{
+
+	Swal.fire({
+
+		allowOutsideClick : false,
+		allowEscapekey : false,
+		allowEnterKey : false,
+		showCloseButton : false,
+		showConfirmButton : false,
+		timer: 2000,
+		timerProgressBar: true,
+		icon : 'error',
+		title : 'Datos invalidos'
+
+	}).then((result)=>{
+
+		usuario();
+	})
+}
+
+const opciones = () =>{
+
+	const btnopc = document.getElementById('btn-opc');
+
+	btnopc.addEventListener('click', ()=>{
+
+		Swal.fire({
+
+			showCloseButton : true,
+			showConfirmButton : false,
+			title : 'Opciones de usuario',
+			html : `
+				<form method="post">
+					<button type="submit" name="generar-informe" id="btnSubir" class="btn btn-primary p-3 w-50">Generar informe</button>
+					<button type="submit" name="salir" id="btnSubir" class="btn btn-primary p-3 mt-3 w-50">Cerrar secion</button>
+				</form>
+			`
+		})
+	})
+}
+
+
 window.addEventListener('load', ()=>{
 
 	document.getElementById('loader').classList.add('d-none');
@@ -169,5 +237,5 @@ window.addEventListener('load', ()=>{
 
 agregarinforclase();
 irinicio();
-opcdeclases();
 irACreador();
+opciones();

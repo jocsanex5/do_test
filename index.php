@@ -56,13 +56,34 @@
 
 			<div id="c0ntent" class="container-fluit p-3 w-100 h-100 bg-white" id="content">
 				<div id="content-ini" class="mt-5 v">
+					<div class="ms-usu">
+						<?php if(isset($_SESSION['acceso'])):
+
+								if($_SESSION['acceso'] == 'admin'): ?>
+
+									<div class="bg-secondary alert alert-dismissible fade show m-4" role="alert">
+										<strong>Hola Admin :)</strong>
+										<p class="mt-3 text-white">Eres administrador, tienes todos los privilegios.</p>
+									</div>
+
+							<?php else: ?>
+
+								<div class="bg-secondary alert alert-dismissible fade show m-4" role="alert">
+									<strong>Has iniciado como visitante</strong>
+									<p class="mt-3 text-white">Puedes visualizar el contenido pero no editarlo</p>
+								</div>
+
+							<?php endif; ?>
+						<?php endif; ?>
+					</div>
+
 					<?php if(cantDeClases($conn, 'cant') == 1): ?>
 
-						<h1>No hay registros <span class="badge">FT</span></h1>
+						<h1 class="fw-bold mt-5">No hay registros <span class="badge">Jx5</span></h1>
 
 						<p class="mt-3">
-							Aqui se visializaran las clases impartidas. Agrega datos a la
-							app..
+							Aqui se visializaran las clases impartidas y los datos de la app datos a la
+							app... 
 						</p>
 
 					<?php else: 
@@ -106,24 +127,42 @@
 				</div>
 
 				<div id="content-agg" class="d-none v">
-					<form class="m-auto" method="get" action="index.php">
-						<div class="mb-3">
-							<label class="form-label text-secondary">Tema de la clase</label>
-							<input type="text" class="form-control border-2 border-top-0 border-start-0 border-end-0" name="temaCls" required="">
+
+					<?php if($_SESSION['acceso'] == 'admin'): ?>
+
+						<form id="fomr-agg" class="m-auto" method="get" action="index.php">
+							<div class="mb-3">
+								<label class="form-label text-secondary">Tema de la clase</label>
+								<input type="text" class="form-control border-2 border-top-0 border-start-0 border-end-0" name="temaCls" required="">
+							</div>
+
+							<div class="mb-3">
+								<label class="form-label text-secondary">fecha</label>
+								<input type="date" name="fechaCls" value="2021-07-28" class="form-control border-2 border-top-0 border-start-0 border-end-0" required="">
+							</div>
+
+							<div class="mb-3">
+								<label class="form-label text-secondary">Description</label>
+								<textarea  class="form-control" name="descls" id="desClass" cols="30" rows="10" required=""></textarea>
+							</div>
+
+							<button type="submit" name="siguiente" id="btnSubir" class="btn btn-primary p-3 w-50 w-lg-25">Siguiente</button>
+						</form>
+
+					<?php else: ?>
+
+						<div class="container m-4 p4" id="acceso-invit">
+							<h2 class="fw-bold">No puedes hacer registros...</h2>
+
+							<p class="mt-3">
+								Haz accedido como invitado, no puedes agregar registros solo visualizarlos,
+								debes de obtener permisos de administrador. Consulta con el creador.
+							</p>
+
+							<img src="recursos/candado.png" width="200px" class="mt-4" alt="">
 						</div>
 
-						<div class="mb-3">
-							<label class="form-label text-secondary">fecha</label>
-							<input type="date" name="fechaCls" value="2021-07-28" class="form-control border-2 border-top-0 border-start-0 border-end-0" required="">
-						</div>
-
-						<div class="mb-3">
-							<label class="form-label text-secondary">Description</label>
-							<textarea  class="form-control" name="descls" id="desClass" cols="30" rows="10" required=""></textarea>
-						</div>
-
-						<button type="submit" name="siguiente" id="btnSubir" class="btn btn-primary p-3 w-50 w-lg-25">Siguiente</button>
-					</form>
+					<?php endif; ?>
 				</div>
 
 				<div id="content-creador" class="d-none v w-100">
@@ -150,37 +189,44 @@
 							</a>
 						</div>
 					</div>
+
+					<!-- <div class="m-3">
+						<form action="index.php" method="get">
+							<button type="submit" name="salir" id="btnSubir" class="btn btn-primary p-3 w-50 w-lg-25">Salir</button>
+						</form>
+					</div> -->
 				</div>
 			</div>
 
 			<div class="container f0rm-subir-evi d-none">
-				<form method="POST" action="index.php" enctype="multipart/form-data">
+				<form method="post" action="index.php" enctype="multipart/form-data">
 					<div>
 						<h2 class="m-3">Evidencias de clase</h2>
 					</div> 
 
+					<div class="img m-2">
+						<img src="recursos/imagen.png" width="300px" alt="">
+					</div>
+
 				 	<div class="mb-3">
-						<label for="formFile" class="form-label">Evi1</label>
-						<input class="form-control bg-white" name="evi1" type="file" id="formFile1" required="">
-					</div>
-
-					<div class="mb-3">
-						<label for="formFile" class="form-label">Evi2</label>
-						<input class="form-control" name="evi2" type="file" id="formFile2" required="">
-					</div>
-
-					<div class="mb-3">
-						<label for="formFile" class="form-label">Evi3</label>
-						<input class="form-control" name="evi3" type="file" id="formFile3" required="">
+						<label for="formFileMultiple" class="form-label">Selecciona las evidencias...</label>
+						<input name="file[]" class="form-control w-75" type="file" id="file" required="" multiple>
 					</div>
 
 					<button type="submit" name="enviarEvi" id="btnSubir" class="btn btn-primary p-3 w-50">Subir evidencias</button>
 				 </form>
 			</div>
 		</div>
+
+		<div class="opc" id="btn-opc">
+			<div class="content">
+				<i class="fas fa-caret-square-down fs-1 position-fixed bottom-0 end-0 m-3 text-white bg-secondary p-3 rounded-circle"></i>
+			</div>
+		</div>
 	</div>
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+	<script src="https://kit.fontawesome.com/2c36e9b7b1.js" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script src="main.js"></script>
 
@@ -190,6 +236,8 @@
 		subirEvidens($conn);
 		elimnClass($conn);
 		modificarClass($conn);
+		eventosClases();
+		salir();
 
 	?>
 </body>
