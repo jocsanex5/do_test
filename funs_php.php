@@ -211,7 +211,7 @@ session_start();
 	{
 		if(isset($_POST['entrar-admin'])){
 
-			if(preg_match("/^j0cSanAdmin0521s2$/", $_POST['cod-entrar'])){
+			if(preg_match("/^j0csAn@dmin521$/", $_POST['cod-entrar'])){
 
 				$_SESSION['acceso'] = 'admin';
 				unset($_SESSION['err']);

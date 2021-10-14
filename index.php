@@ -189,12 +189,6 @@
 							</a>
 						</div>
 					</div>
-
-					<!-- <div class="m-3">
-						<form action="index.php" method="get">
-							<button type="submit" name="salir" id="btnSubir" class="btn btn-primary p-3 w-50 w-lg-25">Salir</button>
-						</form>
-					</div> -->
 				</div>
 			</div>
 

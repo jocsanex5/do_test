@@ -7,15 +7,10 @@
 		________________________
 	*/
 
-	// $host = "bs6qky2w2qtwb750goke-mysql.services.clever-cloud.com";
-	// $database = "bs6qky2w2qtwb750goke";
-	// $username = "uep2azywn1e2asqk";
-	// $password = "6WGjJ2iVirjH7X3lTwTS";
-
-	$host = "localhost";
-	$database = "formtest_db";
-	$username = "root";
-	$password = "";
+	$host = "bs6qky2w2qtwb750goke-mysql.services.clever-cloud.com";
+	$database = "bs6qky2w2qtwb750goke";
+	$username = "uep2azywn1e2asqk";
+	$password = "6WGjJ2iVirjH7X3lTwTS";
 
 	// Cestablecer conexion
 	$conn = mysqli_connect($host, $username, $password, $database);
