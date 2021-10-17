@@ -69,10 +69,7 @@ const evidenciasIMG = () =>{
 
 	f0rm_subir_evi.classList.toggle('d-none');	
 
-	btnSubir.addEventListener('submit', ()=>{
-
-		f0rm_subir_evi.classList.toggle('d-none');	
-	})
+	document.getElementById('btn-opc').classList.add('d-none');
 }
 
 const cargar = () =>{
@@ -172,7 +169,7 @@ const usuario = () =>{
 		title : 'Bienvenido!!!',
 		html : `
 			<form action="funs_php.php" method="post">
-				<img src="recursos/usuario.png" width="200px" alt="">
+				<i class="far fa-user m-3" id="icon-user"></i>
 
 				<div class="mb-3">
 					<label for="exampleInputPassword1" class="form-label">Cod de entrada</label>

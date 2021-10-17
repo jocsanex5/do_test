@@ -1,8 +1,28 @@
 <?php
 
+include_once('php/vendor/autoload.php');
+
+//requerimientos de la API de google drive
+
+putenv('GOOGLE_APPLICATION_CREDENTIALS=dotes-db-11bb4295a5ea.json');
+
+$client = new Google_Client();
+$client->useApplicationDefaultCredentials();
+$client->setScopes(['https://www.googleapis.com/auth/drive.file']);
+
 session_start();
 
-	$cantReg = 0;
+	/* esta funcion genera el formualrio de ingreso de usuario */
+
+	function mostrarFormIngreso()
+	{
+		?><script>usuario();</script>;<?php
+	}
+
+	function recargarPagina()
+	{
+		?><script>cargar();</script>;<?php
+	}
 
 	/*
 		crear nueva clase
@@ -12,89 +32,109 @@ session_start();
 	{
 		if(isset($_GET['siguiente'])){
 
-			$id = uniqid();
-			$tema = $_GET['temaCls'];
-			$fecha = $_GET['fechaCls'];
-			$des = $_GET['descls'];
+			$_SESSION['id_sub_im'] = array(
 
-			$aggDatos = "INSERT INTO `clases` (`id`, `tema`, `fecha`, `descripcion`) VALUES ('$id', '$tema', '$fecha', '$des');";
+				'id' => uniqid(),
+				'tema' => $_GET['temaCls'],
+				'fecha' => $_GET['fechaCls'],
+				'descripcion' => $_GET['descls']
+			);
+
+			?><script>evidenciasIMG();</script><?php
+		}
+	}
+
+	function subirEvidens($conn, $client)
+	{ 
+		if (isset($_POST['enviarEvi'])) { 
+
+				//cantidad de evidencias cargadas
+			$countfiles = count($_FILES['file']['name']);
+
+				//datos de la clase
+			$id_clase = $_SESSION['id_sub_im']['id'];
+			$tema = $_SESSION['id_sub_im']['tema'];
+			$fecha = $_SESSION['id_sub_im']['fecha'];
+			$des = $_SESSION['id_sub_im']['descripcion'];
+
+			/*
+				subir datos de clase a MYSQL
+				______________________________
+			*/
+
+			$aggDatos = "INSERT INTO `clases` (`id`, `tema`, `fecha`, `descripcion`) VALUES ('$id_clase', '$tema', '$fecha', '$des');";
 			$consulDatos = mysqli_query($conn, $aggDatos);
 
 			if($consulDatos){
 
-				$consulta_new_tab = " 
-					CREATE TABLE `$id`(
-						cod_imagen INT PRIMARY KEY AUTO_INCREMENT,
-						imagen VARCHAR(50)
-					)
-				";
+				$consulaCrearTablaEvis = "
 
-				$resultado_new_tab = mysqli_query($conn, $consulta_new_tab);
+					CREATE TABLE `$id_clase`(
 
-				?>
-					<script>evidenciasIMG();</script>;
-				<?php
+					idimage INT(60) PRIMARY KEY auto_increment,
+					nombre VARCHAR(200) NOT NULL
+				)";
 
-				$_SESSION['id_sub_im'] = $id;
-			
-			} else{
+				$resultadoCrearTabla = mysqli_query($conn, $consulaCrearTablaEvis);
 
-				echo 'no';
+				if($resultadoCrearTabla){ echo "jdf";
+
+					/*
+						Subir fotos al drive mediante la API de Gooogle...
+						__________________________________________________
+					*/
+
+					for ($i=0; $i < $countfiles; $i++){
+
+						$nombre = $_FILES['file']['name'][$i];
+						$tmp = $_FILES['file']['tmp_name'][$i];
+						$type = $_FILES['file']['type'][$i];
+
+						try{
+
+							// subir imagen a drive
+
+							$service = new Google_Service_DriVe($client);
+							$file_path = $tmp;
+
+							$file = new Google_Service_Drive_DriveFile();
+							$file->setName($nombre);
+							$file->setParents(array('1ovWZupoB2D3_UGNke8NHvW8wIfZlvqbh'));
+							$file->setDescription('EvidenciaClass');
+							$file->setmimeType($type);
+
+							$resultado = $service->files->create(
+
+								$file,
+								array(
+									'data' => file_get_contents($file_path),
+									'mimeType' => $type,
+									'uploadType' => 'media' 					
+								)
+							);
+
+							// subir datos de la imagen a msql
+
+							$consultaImg = "INSERT INTO `$id_clase`(`nombre`) VALUES ('$resultado->id')";
+							$resultadoImg = mysqli_query($conn, $consultaImg);
+
+						} catch(Google_Service_Exception $gs){
+
+							$mensaje = json_decode($gs->getMessage());
+
+							echo $mensaje->error->message();
+						
+						} catch(Exception $e){
+
+							echo $e->getMessage();
+						}
+					}
+
+					$_SESSION['id_sub_im'] = ''; // recetear valor...
+
+					recargarPagina();
+				}
 			}
-		}
-	}
-
-	function db_img($name_input, $conn)
-	{
-		$imagen = $_FILES[$name_input]['name'];
-
-		if (isset($imagen) && $imagen != "") {
-
-			$id = $_SESSION['id_sub_im'];
-			$tipo = $_FILES[$name_input]['type'];
-			$temp = $_FILES[$name_input]['tmp_name'];
-				
-			$subirFoto = "INSERT INTO `$id`(imagen) VALUES ('$imagen')";
-			$consulFoto = mysqli_query($conn, $subirFoto);
-
-			if($consulFoto){
-
-				move_uploaded_file($temp, 'recursos/evidencias' . $imagen);
-				$id_sub_im = null;
-			
-			} else{
-
-				echo "ERR-IM_DB";
-			}
-		}
-	}
-
-	function subirEvidens($conn)
-	{ 
-		if (isset($_POST['enviarEvi'])) { 
-
-			$id = $_SESSION['id_sub_im'];
-
-			$countfiles = count($_FILES['file']['name']);
-
-			for ($i=0; $i < $countfiles; $i++) { 
-				
-				$nombre = $_FILES['file']['name'][$i];
-				$tmp = $_FILES['file']['tmp_name'][$i];
-
-				$subirFoto = "INSERT INTO `$id`(imagen) VALUES ('$nombre')";
-				$consulFoto = mysqli_query($conn, $subirFoto);
-
-				move_uploaded_file($tmp, 'recursos/evidencias/' . $nombre);
-			}
-
-			$_SESSION['id_sub_im'] = '';
-
-			?>
-				<script>
-					window.location = "index.php";
-				</script>
-			<?php
 		}
 	}
 
@@ -119,7 +159,7 @@ session_start();
 	//consultar datos de las imagenes...
 	$generarEvidencias = function($id, $conn){
 
-		$img = "SELECT imagen FROM `$id`";
+		$img = "SELECT nombre FROM `$id`";
 		$consultaImg = mysqli_query($conn, $img);
 
 		if($consultaImg){
@@ -136,53 +176,19 @@ session_start();
 
 			//eliminar por completo datos de la base de datos...
 
-			//de la tabla clases
-
 			$id_clase = $_GET['class-id-select'];	
 
 			$elimnClass = "DELETE FROM clases WHERE clases . id = '$id_clase'";
 			$consultaElimn = mysqli_query($conn, $elimnClass);
 
-			//borrar fotos del servidor
+			$elimnTabla = "DROP TABLE `$id_clase`";
+			$conmsultaElimnTabla = mysqli_query($conn, $elimnTabla);
 
-				$borrarFotosDel_S = "SELECT imagen FROM `$id_clase`";
-				$consultaBorrarFoto_S = mysqli_query($conn, $borrarFotosDel_S);
+			if($consultaElimn && $conmsultaElimnTabla){
 
-				while($imagenes[] = mysqli_fetch_array($consultaBorrarFoto_S));
-
-			foreach ($imagenes as $key) {
-
-				if ($key != '') {
-
-					unlink('recursos/evidencias/' . $key['imagen']); //borrar del directorio..
-				}
-			}
-
-			if($consultaElimn && $consultaBorrarFoto_S){
-
-				$elimnTablaClass = "DROP TABLE `$id_clase`";
-				$consultaElimTablaClass = mysqli_query($conn, $elimnTablaClass);
-
-				if($consultaElimTablaClass){
-
-					?>
-						<script>cargar();</script>;
-					<?php
-				}
+				recargarPagina();
 			}
 		}
-	}
-
-	/* esta funcion genera el formualrio de ingreso de usuario */
-
-	function mostrarFormIngreso()
-	{
-		?><script>usuario();</script>;<?php
-	}
-
-	function recargarPagina()
-	{
-		?><script>cargar();</script>;<?php
 	}
 
 	function modificarClass($conn)

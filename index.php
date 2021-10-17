@@ -12,7 +12,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Test Form By Jx5</title>
+	<title>Do Test By Jx5</title>
 	<link rel="shortcut icon" href="recursos/favicon.png" type="image/x-icon">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -88,41 +88,37 @@
 
 					<?php else: 
 
-						foreach (cantDeClases($conn, 'arr') as $key) {
-
-							if($key != ''){
-								?>
-									<div id="<?=$key['id']?>" class="mb-5 conten-class d-flex flex-column w-100 p-3 text-center" title="<?=$key['fecha'];?>">
-										<div class="tema-class">
-											<h2 class="fs-1"><?=$key['tema']?></h2>
-										</div>
-
-										<div class="id-class">
-											<span class="d-block fs-6 text-muted fst-italic">Clase <?=$key['id']?></span>
-										</div>
-
-										<div class="descript-class m-3">
-											<p class="fs-5"><?=$key['descripcion']?></p>
-										</div>
-
-										<div class="evis">
-											<?php 
-												foreach ($generarEvidencias($key['id'], $conn) as $key) {
-								
-													if($key['imagen'] != ''){
-														?>
-															<img class="m-2" src="recursos/evidencias/<?=$key['imagen']?>" width="300px" alt="">
-														<?php
-													}
-												}
-											?>
-										</div>
-									</div>
-								<?php
-							}		
-						}
+						foreach (cantDeClases($conn, 'arr') as $key):
 					?>
+							<?php if($key != ''): ?>
 
+								<div id="<?=$key['id']?>" class="mb-5 conten-class d-flex flex-column w-100 p-3 text-center" title="<?=$key['fecha'];?>">
+									<div class="tema-class">
+										<h2 class="fs-1"><?=$key['tema']?></h2>
+									</div>
+
+									<div class="id-class">
+										<span class="d-block fs-6 fst-italic">Clase <?=$key['id']?></span>
+									</div>
+
+									<div class="descript-class m-3">
+										<p class="fs-4"><?=$key['descripcion']?></p>
+									</div>
+
+									<div class="img-class text-center">
+										<?php foreach ($generarEvidencias($key['id'], $conn) as $img):?>
+
+											<?php if($img != ''): ?>
+
+												<img class="m-3 img-evi"  width="300px" src="https://drive.google.com/uc?export=view&id=<?=$img['nombre']?>" width="500px" alt="">
+
+											<?php endif; ?>
+
+										<?php endForeach; ?>
+									</div>
+								</div>
+							<?php endif; ?>
+						<?php endForeach; ?>
 					<?php endif?>
 				</div>
 
@@ -206,7 +202,6 @@
 						<label for="formFileMultiple" class="form-label">Selecciona las evidencias...</label>
 						<input name="file[]" class="form-control w-75" type="file" id="file" required="" multiple>
 					</div>
-
 					<button type="submit" name="enviarEvi" id="btnSubir" class="btn btn-primary p-3 w-50">Subir evidencias</button>
 				 </form>
 			</div>
@@ -227,7 +222,7 @@
 	<?php 
 
 		nuevaClase($conn); 
-		subirEvidens($conn);
+		subirEvidens($conn,$client);
 		elimnClass($conn);
 		modificarClass($conn);
 		eventosClases();

@@ -65,6 +65,12 @@ body{
     }
 }
 
+/* imagen de usuario */
+#icon-user{
+	font-size: 150px;
+	color: #004c45;
+}
+
 /* activo / no activo */
 .v{
 	transition: all 2s;
@@ -84,6 +90,24 @@ body{
 		top: 0;
 	}
 }
+
+/* imagnes de las clases */
+.img-evi{
+	box-shadow: 5px 4px 2px #c6c6c6;
+}
+
+@media (max-width: 800px){
+
+	.img-evi{
+		width: 90%;
+	}
+}
+
+/* id de las clases */
+.id-class{
+	color: #005243;
+}
+
 /* loader */
 .cssload-container * {
 	box-sizing: border-box;
